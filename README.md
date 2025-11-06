@@ -3,6 +3,7 @@ Self-Modulating Audio-Visual Entropy Simulator
 
 Author: Trent Slade (0009-0002-4515-9237)
 Assistive Tools: ChatGPT-5 (code generation), Figma Make (interface prototyping)
+
 License: MIT
 
 Overview
