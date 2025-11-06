@@ -1,37 +1,35 @@
-Quantum Amiga 1200 — QNTOY v2
-Self-Modulating Audio-Visual Entropy Simulator
+# 🎛️ Quantum Amiga 1200 — QNTOY v2  
+### *Self-Modulating Audio-Visual Entropy Simulator*
 
-Author: Trent Slade (0009-0002-4515-9237)
-Assistive Tools: ChatGPT-5 (code generation), Figma Make (interface prototyping)
-License: MIT
+**Author:** Trent Slade (0009-0002-4515-9237)  
+**Assistive Tools:** ChatGPT-5 (code generation), Figma Make (interface prototyping)  
+**License:** MIT  
 
-🧠 Overview
+---
 
-QNTOY is a browser-based simulation where quantum information theory meets vintage Amiga aesthetics.
-Every pixel represents a qutrit (three-state quantum unit).
-Each update cycle evolves the field, generates corresponding sound via the Web Audio API, and visualizes entropy as color and light.
-The result is a living feedback organism — a machine that literally plays its own mathematics.
+## 🧠 Overview
+**QNTOY** is a browser-based simulation where quantum information theory meets vintage Amiga aesthetics.  
+Every pixel represents a **qutrit** (three-state quantum unit).  
+Each update cycle evolves the field, generates corresponding sound via the Web Audio API, and visualizes entropy as color and light.  
+The result is a living feedback organism — a machine that literally *plays its own mathematics*.
 
-⚙️ Features
+---
 
-Qutrit Field Engine – 3-level probabilistic array evolving in real time.
+## ⚙️ Features
+- **Qutrit Field Engine** – 3-level probabilistic array evolving in real time.  
+- **Quantum SID-Chip** – Procedural audio synthesis driven by qutrit flips.  
+- **Spectral Reverb** – Lightweight feedback network mimicking a plate reverb.  
+- **Entropy Feedback** – Reverb time, pitch modulation, and visual brightness scale with system entropy.  
+- **Low-RAM Mode** – Adjustable resolution and frame rate for older hardware.  
 
-Quantum SID-Chip – Procedural audio synthesis driven by qutrit flips.
+---
 
-Spectral Reverb – Lightweight feedback network mimicking a plate reverb.
+## 🚀 Quick Start
 
-Entropy Feedback – Reverb time, pitch modulation, and visual brightness scale with system entropy.
-
-Low-RAM Mode – Adjustable resolution and frame rate for older hardware.
-
-🚀 Quick Start
-
-Clone or Download
-
+### Clone or Download
+```bash
 git clone https://github.com/QSOLKCB/QNTOY.git
 cd QNTOY
-
-
 Run Locally
 
 Open index.html in any modern Chromium browser.
@@ -46,7 +44,7 @@ Pulse	Forces an entropy spike (visual + auditory).
 Reset	Collapses all qutrits to |0⟩ state.
 🔊 Enable Audio	Required user gesture to start Web Audio.
 Reverb Mix Slider	Adjusts wet/dry signal ratio.
-<pre>🧩 Architecture
+
 /src
  ├── QAmigaCore.ts      # qutrit logic + entropy estimator
  ├── QAmigaAudio.ts     # SID-chip oscillator + LFO engine
@@ -54,7 +52,7 @@ Reverb Mix Slider	Adjusts wet/dry signal ratio.
  ├── QAmigaDisplay.tsx  # canvas renderer + audio-visual coupling
  ├── QAmigaControls.tsx # UI buttons + sliders
  ├── QAmigaStats.tsx    # live metrics (cycles, entropy, qutrit count)
- └── logger.js          # CSV data-logger</pre>
+ └── logger.js          # CSV data-logger
 
 📚 Citation
 
@@ -93,7 +91,7 @@ Chromium browser (Chrome, Edge, Brave, Arc).
 
 Modern CPU with SIMD; 8 GB RAM recommended (≤ 2 GB with Low-RAM mode).
 
-Manual click to enable audio (per browser policy).
+Manual click required to enable audio (per Web Audio policy).
 
 Expected Output
 
@@ -109,9 +107,10 @@ Reviewers may treat this as both an art-science demonstration and a replicable e
 
 The following code block shows the main entry point (Main.tsx).
 It initializes the simulation (160×120 Low-RAM mode) and provides a 60-second CSV logger.
-<pre>
+
 // Quantum Amiga 1200 — QNTOY v2 Main Entry
 // Trent Slade 2025
+
 import { useEffect, useRef } from "react";
 import { QAmigaCore } from "./QAmigaCore";
 import QAmigaDisplay from "./QAmigaDisplay";
@@ -146,8 +145,8 @@ export default function App() {
       <button
         onClick={startLogging}
         className="mt-3 bg-cyan-700 hover:bg-cyan-600 text-white py-1 px-3 rounded-lg"
-      ></pre>
-       <pre> Start 60 s Log
+      >
+        Start 60 s Log
       </button>
       <div className="text-xs text-gray-500 mt-4 text-center">
         © 2025 Trent Slade • Built with ChatGPT-5 + Figma Make
@@ -155,18 +154,18 @@ export default function App() {
     </div>
   );
 }
-      </pre>
+
 Reviewer Instructions
 
 Run in any Chromium browser.
 
 Click window to enable audio.
 
-Observe brightness ↔ entropy, tone ↔ state transitions.
+Observe brightness ↔ entropy and tone ↔ state transitions.
 
 Press Start 60 s Log → downloads qntoy_log.csv.
 
-Compare entropy vs sound complexity in the CSV.
+Compare entropy vs. sound complexity in the CSV.
 
 For longer runs or higher res:
 
@@ -176,10 +175,10 @@ const logger = new QNLogger(core, 120); // 2-minute log
 
 Test across browsers and frame rates for consistency.
 
-Expected Observations
+🎧 Expected Observations
 
 Low entropy: dim image + steady tone.
 
 High entropy: bright CRT flare, chaotic panning, long reverb.
 
-CSV data: entropy and reverb rise together, confirming feedback loop.
+CSV data: entropy and reverb rise together → confirms feedback loop.
