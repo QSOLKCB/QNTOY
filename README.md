@@ -146,8 +146,8 @@ export default function App() {
       <button
         onClick={startLogging}
         className="mt-3 bg-cyan-700 hover:bg-cyan-600 text-white py-1 px-3 rounded-lg"
-      >
-        Start 60 s Log
+      ></pre>
+       <pre> Start 60 s Log
       </button>
       <div className="text-xs text-gray-500 mt-4 text-center">
         © 2025 Trent Slade • Built with ChatGPT-5 + Figma Make
