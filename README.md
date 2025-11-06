@@ -109,7 +109,7 @@ Reviewers may treat this as both an art-science demonstration and a replicable e
 
 The following code block shows the main entry point (Main.tsx).
 It initializes the simulation (160×120 Low-RAM mode) and provides a 60-second CSV logger.
-
+<pre>
 // Quantum Amiga 1200 — QNTOY v2 Main Entry
 // Trent Slade 2025
 import { useEffect, useRef } from "react";
@@ -155,7 +155,7 @@ export default function App() {
     </div>
   );
 }
-
+      </pre>
 Reviewer Instructions
 
 Run in any Chromium browser.
