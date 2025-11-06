@@ -3,29 +3,28 @@ Self-Modulating Audio-Visual Entropy Simulator
 
 Author: Trent Slade (0009-0002-4515-9237)
 Assistive Tools: ChatGPT-5 (code generation), Figma Make (interface prototyping)
-
 License: MIT
 
-Overview
+🧠 Overview
 
 QNTOY is a browser-based simulation where quantum information theory meets vintage Amiga aesthetics.
 Every pixel represents a qutrit (three-state quantum unit).
 Each update cycle evolves the field, generates corresponding sound via the Web Audio API, and visualizes entropy as color and light.
 The result is a living feedback organism — a machine that literally plays its own mathematics.
 
-Features
+⚙️ Features
 
-Qutrit Field Engine: 3-level probabilistic array evolving in real time.
+Qutrit Field Engine – 3-level probabilistic array evolving in real time.
 
-Quantum SID-Chip: Procedural audio synthesis driven by qutrit flips.
+Quantum SID-Chip – Procedural audio synthesis driven by qutrit flips.
 
-Spectral Reverb: Lightweight feedback network mimicking a plate reverb.
+Spectral Reverb – Lightweight feedback network mimicking a plate reverb.
 
-Entropy Feedback: Reverb time, pitch modulation, and visual brightness scale with system entropy.
+Entropy Feedback – Reverb time, pitch modulation, and visual brightness scale with system entropy.
 
-Low-RAM Mode: adjustable resolution & frame-rate for older hardware.
+Low-RAM Mode – Adjustable resolution and frame rate for older hardware.
 
-Quick Start
+🚀 Quick Start
 
 Clone or Download
 
@@ -37,86 +36,82 @@ Run Locally
 
 Open index.html in any modern Chromium browser.
 
-Click anywhere to enable audio.
+Click anywhere to enable audio (Web Audio policy).
 
-Online Demo
-→ qntoyv2.figma.site
+Online Demo: https://qntoyv2.figma.site
 
-Controls
+🎮 Controls
 Action	Effect
-Pulse	Forces an entropy spike (visual & auditory).
-Reset	Collapses all qutrits to
-🔊 Enable Audio	Required browser gesture to start Web Audio.
+Pulse	Forces an entropy spike (visual + auditory).
+Reset	Collapses all qutrits to |0⟩ state.
+🔊 Enable Audio	Required user gesture to start Web Audio.
 Reverb Mix Slider	Adjusts wet/dry signal ratio.
-Architecture
+🧩 Architecture
 /src
- ├── QAmigaCore.ts        # qutrit logic + entropy estimator
- ├── QAmigaAudio.ts       # SID-chip oscillator + LFO engine
- ├── QAmigaReverb.ts      # dual feedback delay network
- ├── QAmigaDisplay.tsx    # canvas renderer + audio-visual coupling
- ├── QAmigaControls.tsx   # UI buttons + sliders
- └── QAmigaStats.tsx      # live metrics (cycles, entropy, qutrit count)
+ ├── QAmigaCore.ts      # qutrit logic + entropy estimator
+ ├── QAmigaAudio.ts     # SID-chip oscillator + LFO engine
+ ├── QAmigaReverb.ts    # dual feedback delay network
+ ├── QAmigaDisplay.tsx  # canvas renderer + audio-visual coupling
+ ├── QAmigaControls.tsx # UI buttons + sliders
+ ├── QAmigaStats.tsx    # live metrics (cycles, entropy, qutrit count)
+ └── logger.js          # CSV data-logger
 
-Citation
-
-If you use or reference QNTOY, cite it as:
+📚 Citation
 
 Slade, T. (2025). Quantum Amiga 1200 — QNTOY v2: A Self-Modulating Audio-Visual Entropy Simulator.
 Zenodo. https://doi.org/10.5281/zenodo.XXXXXXX
 
-Acknowledgements
+🙌 Acknowledgements
 
 Built with code generation assistance from ChatGPT-5 and interface synthesis via Figma Make.
 Dedicated to the experimental lineage of the Commodore Amiga and every scientist who ever thought sound could be data.
 
-Usage for Zenodo Reviewers
+🧪 Usage for Zenodo Reviewers
 
-The QNTOY simulation demonstrates entropy-driven feedback between information, sound, and light using entirely client-side computation.
-It provides an accessible visualization of how probabilistic state evolution (in this case, a qutrit field) can be sonified and analyzed in real time.
+The simulation demonstrates entropy-driven feedback between information, sound, and light using entirely client-side computation.
+It visualizes how probabilistic state evolution can be sonified and measured in real time.
 
-Scientific/educational applications
+Scientific / Educational Applications
 
-Illustrates concepts of state superposition, entropy, and decoherence through interactive media.
+Illustrates superposition, entropy, and decoherence through interactive media.
 
-Allows measurement of emergent order from stochastic dynamics using an on-screen entropy meter and optional CSV data logging.
+Enables measurement of emergent order from stochastic dynamics via on-screen entropy and optional CSV logging.
 
-Provides a compact platform for teaching information physics and complex-system feedback loops using minimal computational resources (pure JavaScript/Web Audio, no backend).
+Serves as a teaching platform for information physics and feedback loops using only JavaScript + Web Audio.
 
-Verification and reproducibility
+Verification & Reproducibility
 
-All algorithms are deterministic given the same random seed.
+Deterministic given the same random seed.
 
-Entropy, audio level, and reverb parameters can be logged over time via the built-in data-logger script (logger.js).
+Entropy, audio level, and reverb logged via logger.js.
 
-Code executes fully offline; no external libraries or data calls.
+Fully offline; no external libraries or data calls.
 
-System requirements
+System Requirements
 
-Chromium-based browser (Chrome, Edge, Brave, or Arc).
+Chromium browser (Chrome, Edge, Brave, Arc).
 
-Modern CPU with SIMD; 8 GB RAM recommended for full resolution (Low-RAM mode available).
+Modern CPU with SIMD; 8 GB RAM recommended (≤ 2 GB with Low-RAM mode).
 
-Audio enabled by user gesture per Web Audio API policy.
+Manual click to enable audio (per browser policy).
 
-Expected output
+Expected Output
 
 Visual: 2D qutrit field pulsing with entropy.
 
-Audio: evolving tonal field whose timbre, modulation, and reverb length correspond to entropy dynamics.
+Audio: Evolving tonal field whose timbre and reverb reflect entropy dynamics.
 
-CSV (optional): timestamp,entropy,reverb_time,audio_level.
+CSV: timestamp, entropy, reverb_time, audio_level.
 
-Reviewers may treat this repository as both an art-science demonstration and a replicable simulation environment illustrating real-time coupling between informational entropy and procedural signal synthesis.
-Notes for Reviewers
+Reviewers may treat this as both an art-science demonstration and a replicable entropy-sonification environment.
 
-The following code block represents the main entry point (Main.tsx) of QNTOY v2.
-It initializes the qutrit simulation, sets default resolution to low-RAM mode (160×120), and exposes a 60-second data logger that produces a downloadable CSV.
+🧭 Notes for Reviewers
 
-Reviewers are encouraged to experiment with this module to test reproducibility, performance, and parameter sensitivity.
+The following code block shows the main entry point (Main.tsx).
+It initializes the simulation (160×120 Low-RAM mode) and provides a 60-second CSV logger.
 
 // Quantum Amiga 1200 — QNTOY v2 Main Entry
 // Trent Slade 2025
-
 import { useEffect, useRef } from "react";
 import { QAmigaCore } from "./QAmigaCore";
 import QAmigaDisplay from "./QAmigaDisplay";
@@ -129,17 +124,13 @@ export default function App() {
   const loggerRef = useRef<QNLogger | null>(null);
 
   useEffect(() => {
-    // Initialize core and logger once
     const core = new QAmigaCore(160, 120); // Low-RAM mode
     const logger = new QNLogger(core);
     coreRef.current = core;
     loggerRef.current = logger;
   }, []);
 
-  const startLogging = () => {
-    const logger = loggerRef.current;
-    if (logger) logger.start();
-  };
+  const startLogging = () => loggerRef.current?.start();
 
   return (
     <div className="flex flex-col items-center justify-center bg-slate-900 text-white p-4 min-h-screen font-mono">
@@ -149,25 +140,15 @@ export default function App() {
       <p className="text-sm text-gray-400 mb-3">
         Self-Modulating Audio-Visual Entropy Simulator
       </p>
-
-      {/* Display */}
       {coreRef.current && <QAmigaDisplay core={coreRef.current} />}
-
-      {/* Controls */}
       {coreRef.current && <QAmigaControls core={coreRef.current} />}
-
-      {/* Stats */}
       {coreRef.current && <QAmigaStats core={coreRef.current} />}
-
-      {/* Data Logging */}
       <button
         onClick={startLogging}
         className="mt-3 bg-cyan-700 hover:bg-cyan-600 text-white py-1 px-3 rounded-lg"
       >
-        Start 60s Log
+        Start 60 s Log
       </button>
-
-      {/* Footer */}
       <div className="text-xs text-gray-500 mt-4 text-center">
         © 2025 Trent Slade • Built with ChatGPT-5 + Figma Make
       </div>
@@ -175,27 +156,30 @@ export default function App() {
   );
 }
 
+Reviewer Instructions
 
-Reviewer instructions:
+Run in any Chromium browser.
 
-Run this component in any modern Chromium browser (Chrome, Edge, or Brave).
+Click window to enable audio.
 
-Click the window to enable audio (browser security requirement).
+Observe brightness ↔ entropy, tone ↔ state transitions.
 
-Observe the display — color intensity reflects live entropy; audio pulses correspond to quantum state transitions.
+Press Start 60 s Log → downloads qntoy_log.csv.
 
-Press Start 60s Log to generate qntoy_log.csv, containing entropy, reverb time, and audio level at one-second intervals.
+Compare entropy vs sound complexity in the CSV.
 
-Use the CSV to verify correlation between entropy growth and sound complexity.
+For longer runs or higher res:
 
-For extended tests, modify:
-
-const core = new QAmigaCore(320, 256); // full-res mode
-
-
-or
-
+const core = new QAmigaCore(320, 256); // full-res
 const logger = new QNLogger(core, 120); // 2-minute log
 
 
-Compare results across browsers and frame rates for performance consistency.
+Test across browsers and frame rates for consistency.
+
+Expected Observations
+
+Low entropy: dim image + steady tone.
+
+High entropy: bright CRT flare, chaotic panning, long reverb.
+
+CSV data: entropy and reverb rise together, confirming feedback loop.
