@@ -46,7 +46,7 @@ Pulse	Forces an entropy spike (visual + auditory).
 Reset	Collapses all qutrits to |0⟩ state.
 🔊 Enable Audio	Required user gesture to start Web Audio.
 Reverb Mix Slider	Adjusts wet/dry signal ratio.
-🧩 Architecture
+<pre>🧩 Architecture
 /src
  ├── QAmigaCore.ts      # qutrit logic + entropy estimator
  ├── QAmigaAudio.ts     # SID-chip oscillator + LFO engine
@@ -54,7 +54,7 @@ Reverb Mix Slider	Adjusts wet/dry signal ratio.
  ├── QAmigaDisplay.tsx  # canvas renderer + audio-visual coupling
  ├── QAmigaControls.tsx # UI buttons + sliders
  ├── QAmigaStats.tsx    # live metrics (cycles, entropy, qutrit count)
- └── logger.js          # CSV data-logger
+ └── logger.js          # CSV data-logger</pre>
 
 📚 Citation
 
