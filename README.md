@@ -1,11 +1,10 @@
 # 🎛️ Quantum Amiga 1200 — QNTOY v2  
 ### *Self-Modulating Audio-Visual Entropy Simulator*  
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17540042.svg)](https://doi.org/10.5281/zenodo.17540042)
+
 **Author:** Trent Slade (0009-0002-4515-9237)  
 **Assistive Tools:** ChatGPT-5 (code generation), Figma Make (interface prototyping)  
-**License:** MIT License
-
-Copyright (c) 2025 Trent Slade
+**License:** MIT License  
 
 ---
 
@@ -33,7 +32,6 @@ The result is a living feedback organism — a machine that literally *plays its
 git clone https://github.com/QSOLKCB/QNTOY.git
 cd QNTOY
 Run Locally
-
 Open index.html in any modern Chromium browser.
 
 Click anywhere to enable audio (Web Audio policy).
@@ -47,6 +45,9 @@ Reset	Collapses all qutrits to |0⟩ state.
 🔊 Enable Audio	Required user gesture to start Web Audio.
 Reverb Mix Slider	Adjusts wet/dry signal ratio.
 
+🧩 Architecture
+bash
+Copy code
 /src
  ├── QAmigaCore.ts      # qutrit logic + entropy estimator
  ├── QAmigaAudio.ts     # SID-chip oscillator + LFO engine
@@ -55,24 +56,19 @@ Reverb Mix Slider	Adjusts wet/dry signal ratio.
  ├── QAmigaControls.tsx # UI buttons + sliders
  ├── QAmigaStats.tsx    # live metrics (cycles, entropy, qutrit count)
  └── logger.js          # CSV data-logger
-
 📚 Citation
-
 Slade, T. (2025). Quantum Amiga 1200 — QNTOY v2: A Self-Modulating Audio-Visual Entropy Simulator.
-Zenodo. https://doi.org/10.5281/zenodo.XXXXXXX
+Zenodo. https://doi.org/10.5281/zenodo.17540042
 
 🙌 Acknowledgements
-
-Built with code generation assistance from ChatGPT-5 and interface synthesis via Figma Make.
+Built with code-generation assistance from ChatGPT-5 and interface synthesis via Figma Make.
 Dedicated to the experimental lineage of the Commodore Amiga and every scientist who ever thought sound could be data.
 
 🧪 Usage for Zenodo Reviewers
-
 The simulation demonstrates entropy-driven feedback between information, sound, and light using entirely client-side computation.
 It visualizes how probabilistic state evolution can be sonified and measured in real time.
 
 Scientific / Educational Applications
-
 Illustrates superposition, entropy, and decoherence through interactive media.
 
 Enables measurement of emergent order from stochastic dynamics via on-screen entropy and optional CSV logging.
@@ -80,7 +76,6 @@ Enables measurement of emergent order from stochastic dynamics via on-screen ent
 Serves as a teaching platform for information physics and feedback loops using only JavaScript + Web Audio.
 
 Verification & Reproducibility
-
 Deterministic given the same random seed.
 
 Entropy, audio level, and reverb logged via logger.js.
@@ -88,7 +83,6 @@ Entropy, audio level, and reverb logged via logger.js.
 Fully offline; no external libraries or data calls.
 
 System Requirements
-
 Chromium browser (Chrome, Edge, Brave, Arc).
 
 Modern CPU with SIMD; 8 GB RAM recommended (≤ 2 GB with Low-RAM mode).
@@ -96,20 +90,18 @@ Modern CPU with SIMD; 8 GB RAM recommended (≤ 2 GB with Low-RAM mode).
 Manual click required to enable audio (per Web Audio policy).
 
 Expected Output
-
 Visual: 2D qutrit field pulsing with entropy.
 
 Audio: Evolving tonal field whose timbre and reverb reflect entropy dynamics.
 
 CSV: timestamp, entropy, reverb_time, audio_level.
 
-Reviewers may treat this as both an art-science demonstration and a replicable entropy-sonification environment.
-
 🧭 Notes for Reviewers
-
 The following code block shows the main entry point (Main.tsx).
 It initializes the simulation (160×120 Low-RAM mode) and provides a 60-second CSV logger.
 
+tsx
+Copy code
 // Quantum Amiga 1200 — QNTOY v2 Main Entry
 // Trent Slade 2025
 
@@ -156,9 +148,7 @@ export default function App() {
     </div>
   );
 }
-
 Reviewer Instructions
-
 Run in any Chromium browser.
 
 Click window to enable audio.
@@ -171,20 +161,22 @@ Compare entropy vs. sound complexity in the CSV.
 
 For longer runs or higher res:
 
+ts
+Copy code
 const core = new QAmigaCore(320, 256); // full-res
 const logger = new QNLogger(core, 120); // 2-minute log
-
-
 Test across browsers and frame rates for consistency.
 
 🎧 Expected Observations
-
 Low entropy: dim image + steady tone.
 
 High entropy: bright CRT flare, chaotic panning, long reverb.
 
 CSV data: entropy and reverb rise together → confirms feedback loop.
 
+🪪 License
+text
+Copy code
 MIT License
 
 Copyright (c) 2025 Trent Slade
