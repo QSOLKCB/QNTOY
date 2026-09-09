@@ -18,7 +18,7 @@ export class QNTOYAudio {
     this.levelData = null;
     this.spectrumData = null;
     this.stopping = null;
-    this.toggleQueue = Promise.resolve();
+    this.toggleTransition = null;
 
     this.input = null;
     this.dry = null;
@@ -45,8 +45,10 @@ export class QNTOYAudio {
     this.spectrumData = null;
   }
 
-  async ensureContext() {
-    if (this.stopping) await this.stopping;
+  ensureContext() {
+    if (this.stopping) {
+      throw new Error('Audio is still stopping; start again after the transition completes.');
+    }
     if (this.context && this.context.state !== 'closed') return this.context;
     if (this.context?.state === 'closed') this.clearGraphReferences(this.context);
 
@@ -97,7 +99,7 @@ export class QNTOYAudio {
   }
 
   async start() {
-    const context = await this.ensureContext();
+    const context = this.ensureContext();
     if (context.state === 'suspended') await context.resume();
     this.enabled = true;
     return true;
@@ -131,16 +133,18 @@ export class QNTOYAudio {
   }
 
   toggle() {
-    // Serialize state transitions so overlapping clicks/key repeats observe the
-    // state produced by the previous toggle instead of racing the same branch.
-    const operation = this.toggleQueue.then(() => (
-      this.enabled ? this.stop() : this.start()
-    ));
-    this.toggleQueue = operation.then(
-      () => undefined,
-      () => undefined,
-    );
-    return operation;
+    // Coalesce overlapping activations onto the in-flight transition instead
+    // of queueing an opposite transition after async close()/resume() work.
+    // A restart therefore always needs a fresh user gesture, preserving the
+    // transient activation required by autoplay-gated Web Audio browsers.
+    if (this.toggleTransition) return this.toggleTransition;
+
+    const operation = this.enabled ? this.stop() : this.start();
+    const transition = Promise.resolve(operation).finally(() => {
+      if (this.toggleTransition === transition) this.toggleTransition = null;
+    });
+    this.toggleTransition = transition;
+    return transition;
   }
 
   setVolume(value) {
