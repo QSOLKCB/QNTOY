@@ -15,6 +15,7 @@ let evolutionRate = 0.02;
 let lastStepAt = performance.now();
 let lastStatsAt = 0;
 let toastTimer = null;
+let audioToggleQueue = Promise.resolve();
 
 const elements = {
   runDot: $('#run-dot'),
@@ -62,23 +63,33 @@ function commitChanges(changes, { sonify = true, forceStats = false } = {}) {
   updateStats(forceStats);
 }
 
-async function toggleAudio() {
-  try {
-    audio.setEntropy(field.entropy());
-    const enabled = await audio.toggle();
-    elements.audioButton.textContent = enabled ? 'STOP AUDIO' : 'START AUDIO';
-    elements.audioButton.classList.toggle('is-active', enabled);
-    elements.audioStatus.textContent = enabled ? 'AUDIO ON' : 'AUDIO OFF';
-    if (enabled) {
-      audio.chord(field.entropy());
-      showToast('Web Audio enabled');
-    } else {
-      showToast('Audio stopped');
+function toggleAudio() {
+  const operation = audioToggleQueue.then(async () => {
+    try {
+      audio.setEntropy(field.entropy());
+      const enabled = await audio.toggle();
+      elements.audioButton.textContent = enabled ? 'STOP AUDIO' : 'START AUDIO';
+      elements.audioButton.classList.toggle('is-active', enabled);
+      elements.audioStatus.textContent = enabled ? 'AUDIO ON' : 'AUDIO OFF';
+      if (enabled) {
+        audio.chord(field.entropy());
+        showToast('Web Audio enabled');
+      } else {
+        showToast('Audio stopped');
+      }
+      return enabled;
+    } catch (error) {
+      console.error(error);
+      showToast(error.message || 'Unable to start audio');
+      return audio.enabled;
     }
-  } catch (error) {
-    console.error(error);
-    showToast(error.message || 'Unable to start audio');
-  }
+  });
+
+  audioToggleQueue = operation.then(
+    () => undefined,
+    () => undefined,
+  );
+  return operation;
 }
 
 function setPaused(nextPaused) {
