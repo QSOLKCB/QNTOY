@@ -48,7 +48,9 @@ export class QutritVisualizer {
     this.container = container;
     this.field = field;
     this.audio = audio;
-    this.reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+    this.motionPreference = window.matchMedia?.('(prefers-reduced-motion: reduce)') ?? null;
+    this.reducedMotion = this.motionPreference?.matches ?? false;
+    this.handleMotionPreferenceChange = (event) => this.setReducedMotion(event.matches);
     this.viewMode = 'orbit';
     this.spectrumBuffer = new Uint8Array(128);
 
@@ -82,6 +84,12 @@ export class QutritVisualizer {
     this.buildField();
     this.buildReferenceGrid();
     this.buildSpectrumRibbon();
+
+    if (typeof this.motionPreference?.addEventListener === 'function') {
+      this.motionPreference.addEventListener('change', this.handleMotionPreferenceChange);
+    } else {
+      this.motionPreference?.addListener?.(this.handleMotionPreferenceChange);
+    }
 
     this.resizeObserver = new ResizeObserver(() => this.resize());
     this.resizeObserver.observe(this.container);
@@ -213,6 +221,21 @@ export class QutritVisualizer {
     this.material.uniforms.uPointSize.value = Number(value);
   }
 
+  setReducedMotion(value) {
+    this.reducedMotion = Boolean(value);
+    this.controls.autoRotate = this.viewMode === 'orbit' && !this.reducedMotion;
+
+    if (this.reducedMotion) {
+      this.points.rotation.z = 0;
+      this.material.uniforms.uAudio.value = 0;
+      this.material.uniforms.uTime.value = 0;
+      this.ribbonMaterial.opacity = 0.38;
+      this.updateSpectrum(0);
+    }
+
+    this.controls.update();
+  }
+
   setView(mode) {
     this.viewMode = mode;
     if (mode === 'top') {
@@ -278,6 +301,11 @@ export class QutritVisualizer {
   }
 
   dispose() {
+    if (typeof this.motionPreference?.removeEventListener === 'function') {
+      this.motionPreference.removeEventListener('change', this.handleMotionPreferenceChange);
+    } else {
+      this.motionPreference?.removeListener?.(this.handleMotionPreferenceChange);
+    }
     this.resizeObserver.disconnect();
     this.renderer.setAnimationLoop(null);
     this.controls.dispose();
