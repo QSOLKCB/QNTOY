@@ -12,6 +12,13 @@ test('hashSeed and PRNG are stable for the same seed', () => {
   assert.deepEqual(seqA, seqB);
 });
 
+test('PRNG state remains a wrapped uint32 during long runs', () => {
+  const rng = new SeededRandom('long-run');
+  for (let i = 0; i < 100_000; i += 1) rng.next();
+  assert.ok(Number.isInteger(rng.state));
+  assert.ok(rng.state >= 0 && rng.state <= 0xffffffff);
+});
+
 test('fresh fields with the same seed evolve identically', () => {
   const a = new QutritField({ width: 24, height: 16, seed: 'same-seed' });
   const b = new QutritField({ width: 24, height: 16, seed: 'same-seed' });
