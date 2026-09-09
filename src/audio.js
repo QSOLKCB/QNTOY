@@ -18,6 +18,7 @@ export class QNTOYAudio {
     this.levelData = null;
     this.spectrumData = null;
     this.stopping = null;
+    this.toggleQueue = Promise.resolve();
 
     this.input = null;
     this.dry = null;
@@ -129,9 +130,17 @@ export class QNTOYAudio {
     return false;
   }
 
-  async toggle() {
-    if (this.enabled) return this.stop();
-    return this.start();
+  toggle() {
+    // Serialize state transitions so overlapping clicks/key repeats observe the
+    // state produced by the previous toggle instead of racing the same branch.
+    const operation = this.toggleQueue.then(() => (
+      this.enabled ? this.stop() : this.start()
+    ));
+    this.toggleQueue = operation.then(
+      () => undefined,
+      () => undefined,
+    );
+    return operation;
   }
 
   setVolume(value) {
