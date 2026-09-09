@@ -15,7 +15,7 @@ let evolutionRate = 0.02;
 let lastStepAt = performance.now();
 let lastStatsAt = 0;
 let toastTimer = null;
-let audioToggleQueue = Promise.resolve();
+let audioTogglePending = false;
 
 const elements = {
   runDot: $('#run-dot'),
@@ -63,33 +63,35 @@ function commitChanges(changes, { sonify = true, forceStats = false } = {}) {
   updateStats(forceStats);
 }
 
-function toggleAudio() {
-  const operation = audioToggleQueue.then(async () => {
-    try {
-      audio.setEntropy(field.entropy());
-      const enabled = await audio.toggle();
-      elements.audioButton.textContent = enabled ? 'STOP AUDIO' : 'START AUDIO';
-      elements.audioButton.classList.toggle('is-active', enabled);
-      elements.audioStatus.textContent = enabled ? 'AUDIO ON' : 'AUDIO OFF';
-      if (enabled) {
-        audio.chord(field.entropy());
-        showToast('Web Audio enabled');
-      } else {
-        showToast('Audio stopped');
-      }
-      return enabled;
-    } catch (error) {
-      console.error(error);
-      showToast(error.message || 'Unable to start audio');
-      return audio.enabled;
-    }
-  });
+async function toggleAudio() {
+  if (audioTogglePending) return audio.enabled;
 
-  audioToggleQueue = operation.then(
-    () => undefined,
-    () => undefined,
-  );
-  return operation;
+  audioTogglePending = true;
+  elements.audioButton.disabled = true;
+  elements.audioButton.setAttribute('aria-busy', 'true');
+
+  try {
+    audio.setEntropy(field.entropy());
+    const enabled = await audio.toggle();
+    elements.audioButton.textContent = enabled ? 'STOP AUDIO' : 'START AUDIO';
+    elements.audioButton.classList.toggle('is-active', enabled);
+    elements.audioStatus.textContent = enabled ? 'AUDIO ON' : 'AUDIO OFF';
+    if (enabled) {
+      audio.chord(field.entropy());
+      showToast('Web Audio enabled');
+    } else {
+      showToast('Audio stopped');
+    }
+    return enabled;
+  } catch (error) {
+    console.error(error);
+    showToast(error.message || 'Unable to start audio');
+    return audio.enabled;
+  } finally {
+    audioTogglePending = false;
+    elements.audioButton.disabled = false;
+    elements.audioButton.removeAttribute('aria-busy');
+  }
 }
 
 function setPaused(nextPaused) {
@@ -275,7 +277,7 @@ window.addEventListener('keydown', (event) => {
 
   switch (event.key.toLowerCase()) {
     case 'a':
-      toggleAudio();
+      if (!event.repeat) toggleAudio();
       break;
     case 'p':
       pulse();
