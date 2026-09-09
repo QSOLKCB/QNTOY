@@ -134,16 +134,31 @@ test('stop hard-mutes, closes, and rebuilds the audio graph on restart', async (
   delete globalThis.window;
 });
 
-test('overlapping audio toggles serialize into start then stop', async () => {
+test('overlapping audio toggles coalesce until a fresh transition is requested', async () => {
   globalThis.window = { AudioContext: FakeAudioContext };
   const audio = new QNTOYAudio();
 
-  const first = audio.toggle();
-  const second = audio.toggle();
-  assert.deepEqual(await Promise.all([first, second]), [true, false]);
+  const firstStart = audio.toggle();
+  const secondStart = audio.toggle();
+  assert.equal(firstStart, secondStart);
+  assert.deepEqual(await Promise.all([firstStart, secondStart]), [true, true]);
+  assert.equal(audio.enabled, true);
+  const firstContext = audio.context;
+
+  const firstStop = audio.toggle();
+  const secondStop = audio.toggle();
+  assert.equal(firstStop, secondStop);
+  assert.deepEqual(await Promise.all([firstStop, secondStop]), [false, false]);
   assert.equal(audio.enabled, false);
   assert.equal(audio.context, null);
+  assert.equal(firstContext.closed, true);
 
+  const freshRestart = audio.toggle();
+  assert.equal(await freshRestart, true);
+  assert.equal(audio.enabled, true);
+  assert.notEqual(audio.context, firstContext);
+
+  await audio.stop();
   delete globalThis.window;
 });
 
