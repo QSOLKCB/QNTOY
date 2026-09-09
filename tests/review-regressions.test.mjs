@@ -1,6 +1,7 @@
 // Regression coverage for automated review findings that previously reached PR #1.
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 
 import { QNTOYAudio } from '../src/audio.js';
 import { QutritField } from '../src/core.js';
@@ -133,6 +134,19 @@ test('stop hard-mutes, closes, and rebuilds the audio graph on restart', async (
   delete globalThis.window;
 });
 
+test('overlapping audio toggles serialize into start then stop', async () => {
+  globalThis.window = { AudioContext: FakeAudioContext };
+  const audio = new QNTOYAudio();
+
+  const first = audio.toggle();
+  const second = audio.toggle();
+  assert.deepEqual(await Promise.all([first, second]), [true, false]);
+  assert.equal(audio.enabled, false);
+  assert.equal(audio.context, null);
+
+  delete globalThis.window;
+});
+
 test('getSpectrum clears a caller buffer as soon as audio is disabled', async () => {
   globalThis.window = { AudioContext: FakeAudioContext };
   const audio = new QNTOYAudio();
@@ -203,4 +217,12 @@ test('setState rejects fractional indexes without corrupting counts', () => {
   assert.deepEqual(Array.from(field.counts), initialCounts);
   assert.deepEqual(changes, []);
   assert.equal(Array.from(field.counts).reduce((sum, value) => sum + value, 0), field.size);
+});
+
+test('state distribution meters have explicit accessible labels', () => {
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  for (const [state, word] of [['zero', 'zero'], ['one', 'one'], ['two', 'two']]) {
+    assert.match(html, new RegExp(`id="state-${word}-label"`));
+    assert.match(html, new RegExp(`id="meter-${state}"[^>]+aria-labelledby="state-${word}-label"`));
+  }
 });
