@@ -250,7 +250,9 @@ export class QutritVisualizer {
   }
 
   updateSpectrum(level) {
-    const spectrum = this.audio.getSpectrum(this.spectrumBuffer);
+    const spectrum = this.reducedMotion
+      ? (this.spectrumBuffer.fill(0), this.spectrumBuffer)
+      : this.audio.getSpectrum(this.spectrumBuffer);
     const position = this.ribbonGeometry.getAttribute('position');
     for (let index = 0; index < position.count; index += 1) {
       const sample = spectrum[index] ?? 0;
@@ -261,10 +263,11 @@ export class QutritVisualizer {
 
   render(time) {
     const level = this.audio.getLevel();
-    this.material.uniforms.uAudio.value = level;
+    const visualLevel = this.reducedMotion ? 0 : level;
+    this.material.uniforms.uAudio.value = visualLevel;
     this.material.uniforms.uTime.value = this.reducedMotion ? 0 : time;
-    this.ribbonMaterial.opacity = 0.38 + level * 0.62;
-    this.updateSpectrum(level);
+    this.ribbonMaterial.opacity = this.reducedMotion ? 0.38 : 0.38 + level * 0.62;
+    this.updateSpectrum(visualLevel);
 
     if (this.viewMode === 'orbit' && !this.reducedMotion) {
       this.points.rotation.z = Math.sin(time * 0.00008) * 0.03;
