@@ -1,3 +1,4 @@
+// Regression coverage for automated review findings that previously reached PR #1.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
