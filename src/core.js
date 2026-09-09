@@ -94,19 +94,20 @@ export class QutritField {
   }
 
   replaceStates(values, { cycles = this.cycles } = {}) {
-    const incoming = values instanceof Uint8Array ? values : Uint8Array.from(values);
-    if (incoming.length !== this.size) {
-      throw new RangeError(`expected ${this.size} states, received ${incoming.length}`);
+    const source = values instanceof Uint8Array ? values : Array.from(values ?? []);
+    if (source.length !== this.size) {
+      throw new RangeError(`expected ${this.size} states, received ${source.length}`);
     }
 
     const counts = new Uint32Array(STATE_COUNT);
-    for (const state of incoming) {
-      if (state >= STATE_COUNT) {
+    for (const state of source) {
+      if (!Number.isInteger(state) || state < 0 || state >= STATE_COUNT) {
         throw new RangeError('snapshot contains an invalid qutrit state');
       }
       counts[state] += 1;
     }
 
+    const incoming = values instanceof Uint8Array ? values : Uint8Array.from(source);
     this.states.set(incoming);
     this.counts.set(counts);
     this.cycles = Math.max(0, Number(cycles) || 0);
@@ -121,8 +122,6 @@ export class QutritField {
       if (this.rng.next() >= probability) continue;
 
       const current = this.states[index];
-      // Mostly preserve the original cyclic 0→1→2→0 evolution, with a small
-      // reverse-path probability so the field does not acquire directional bias.
       const direction = this.rng.next() < 0.88 ? 1 : 2;
       this.setState(index, (current + direction) % STATE_COUNT, changes);
     }

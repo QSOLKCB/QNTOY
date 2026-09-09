@@ -10,6 +10,12 @@ function downloadText(filename, text, type) {
   window.setTimeout(() => URL.revokeObjectURL(url), 0);
 }
 
+export function encodeCSVField(value) {
+  const text = String(value ?? '');
+  if (!/[",\r\n]/.test(text)) return text;
+  return `"${text.replace(/"/g, '""')}"`;
+}
+
 export class QNLogger {
   constructor(field, audio, { sampleIntervalMs = 1000 } = {}) {
     this.field = field;
@@ -89,8 +95,8 @@ export class QNLogger {
       record.state_2,
       record.reverb_time_s.toFixed(6),
       record.audio_level.toFixed(6),
-      JSON.stringify(record.seed),
-    ].join(','));
+      record.seed,
+    ].map(encodeCSVField).join(','));
     return `${header.join(',')}\n${lines.join('\n')}\n`;
   }
 }

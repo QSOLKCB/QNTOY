@@ -16,10 +16,37 @@ export class QNTOYAudio {
     this.voiceCounter = 0;
     this.levelData = null;
     this.spectrumData = null;
+    this.stopping = null;
+
+    this.input = null;
+    this.dry = null;
+    this.wet = null;
+    this.delay = null;
+    this.feedback = null;
+    this.master = null;
+    this.compressor = null;
+    this.analyser = null;
+  }
+
+  clearGraphReferences(context = this.context) {
+    if (this.context !== context) return;
+    this.context = null;
+    this.input = null;
+    this.dry = null;
+    this.wet = null;
+    this.delay = null;
+    this.feedback = null;
+    this.master = null;
+    this.compressor = null;
+    this.analyser = null;
+    this.levelData = null;
+    this.spectrumData = null;
   }
 
   async ensureContext() {
-    if (this.context) return this.context;
+    if (this.stopping) await this.stopping;
+    if (this.context && this.context.state !== 'closed') return this.context;
+    if (this.context?.state === 'closed') this.clearGraphReferences(this.context);
 
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
     if (!AudioContextClass) {
@@ -38,7 +65,15 @@ export class QNTOYAudio {
     this.compressor = context.createDynamicsCompressor();
     this.analyser = context.createAnalyser();
 
+    // Establish safe graph values synchronously before anything is connected.
+    // Smoothing is reserved for later user/entropy changes.
+    const initialEntropy = 0.5;
+    this.dry.gain.value = 1 - this.reverbMix * 0.5;
+    this.wet.gain.value = this.reverbMix;
+    this.delay.delayTime.value = 0.09 + initialEntropy * 0.5;
+    this.feedback.gain.value = 0.16 + initialEntropy * 0.43;
     this.master.gain.value = this.volume;
+
     this.analyser.fftSize = 256;
     this.analyser.smoothingTimeConstant = 0.82;
     this.levelData = new Uint8Array(this.analyser.fftSize);
@@ -56,8 +91,6 @@ export class QNTOYAudio {
     this.delay.connect(this.wet).connect(this.master);
     this.master.connect(this.compressor).connect(this.analyser).connect(context.destination);
 
-    this.setReverbMix(this.reverbMix);
-    this.setEntropy(0.5);
     return context;
   }
 
@@ -68,8 +101,30 @@ export class QNTOYAudio {
     return true;
   }
 
-  stop() {
+  async stop() {
     this.enabled = false;
+    const context = this.context;
+    if (!context) return false;
+
+    // Hard-mute immediately so active voices and feedback tails cannot leak
+    // while close() completes. Closing also clears the delay buffer so a later
+    // START AUDIO cannot resurrect an old tail.
+    if (this.master && context.state !== 'closed') {
+      const now = context.currentTime;
+      this.master.gain.cancelScheduledValues(now);
+      this.master.gain.setValueAtTime(0, now);
+    }
+
+    if (context.state !== 'closed') {
+      this.stopping = context.close();
+      try {
+        await this.stopping;
+      } finally {
+        this.stopping = null;
+      }
+    }
+
+    this.clearGraphReferences(context);
     return false;
   }
 

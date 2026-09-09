@@ -55,11 +55,11 @@ function showToast(message) {
   toastTimer = window.setTimeout(() => elements.toast.classList.remove('is-visible'), 2200);
 }
 
-function commitChanges(changes, { sonify = true } = {}) {
+function commitChanges(changes, { sonify = true, forceStats = false } = {}) {
   visualizer.applyChanges(changes);
   if (sonify) audio.sonifyChanges(changes, field);
   audio.setEntropy(field.entropy());
-  updateStats(true);
+  updateStats(forceStats);
 }
 
 async function toggleAudio() {
@@ -72,7 +72,7 @@ async function toggleAudio() {
       audio.chord(field.entropy());
       showToast('Web Audio enabled');
     } else {
-      showToast('Audio muted');
+      showToast('Audio stopped');
     }
   } catch (error) {
     console.error(error);
@@ -90,7 +90,7 @@ function setPaused(nextPaused) {
 
 function pulse() {
   const changes = field.pulse(0.48);
-  commitChanges(changes, { sonify: false });
+  commitChanges(changes, { sonify: false, forceStats: true });
   if (audio.enabled) audio.pulse(field.entropy());
   elements.pulseButton.classList.add('is-flashing');
   window.setTimeout(() => elements.pulseButton.classList.remove('is-flashing'), 180);
@@ -107,7 +107,7 @@ function runOperation(operation) {
     changes = field.applyOperation(operation);
   }
 
-  commitChanges(changes, { sonify: false });
+  commitChanges(changes, { sonify: false, forceStats: true });
   if (audio.enabled) {
     if (operation === 'reset') audio.trigger(0, { entropy: field.entropy(), intensity: 0.9, duration: 0.42 });
     else if (operation === 'phase') audio.pulse(field.entropy());
@@ -195,6 +195,22 @@ function updateRange(control, output, formatter, callback) {
   update();
 }
 
+function isInteractiveShortcutTarget(target) {
+  return Boolean(target?.closest?.([
+    'button',
+    'a[href]',
+    'input',
+    'textarea',
+    'select',
+    'summary',
+    '[contenteditable]:not([contenteditable="false"])',
+    '[role="button"]',
+    '[role="link"]',
+    '[role="slider"]',
+    '[tabindex]:not([tabindex="-1"])',
+  ].join(',')));
+}
+
 elements.audioButton.addEventListener('click', toggleAudio);
 elements.pauseButton.addEventListener('click', () => setPaused(!paused));
 elements.pulseButton.addEventListener('click', pulse);
@@ -237,8 +253,7 @@ updateRange(elements.pointControl, elements.pointOutput, (value) => value.toFixe
 
 window.addEventListener('keydown', (event) => {
   const target = event.target;
-  const isTyping = target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement;
-  if (isTyping || event.ctrlKey || event.metaKey || event.altKey) return;
+  if (isInteractiveShortcutTarget(target) || event.ctrlKey || event.metaKey || event.altKey) return;
 
   if (event.code === 'Space') {
     event.preventDefault();
@@ -278,7 +293,10 @@ window.addEventListener('keydown', (event) => {
   }
 });
 
-window.addEventListener('beforeunload', () => visualizer.dispose(), { once: true });
+window.addEventListener('beforeunload', () => {
+  void audio.stop();
+  visualizer.dispose();
+}, { once: true });
 
 visualizer.syncAll();
 updateStats(true);
