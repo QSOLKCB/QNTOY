@@ -11,6 +11,7 @@ export class QNTOYAudio {
     this.volume = volume;
     this.reverbMix = reverbMix;
     this.spread = spread;
+    this.entropy = 0.5;
     this.context = null;
     this.enabled = false;
     this.voiceCounter = 0;
@@ -66,12 +67,12 @@ export class QNTOYAudio {
     this.analyser = context.createAnalyser();
 
     // Establish safe graph values synchronously before anything is connected.
-    // Smoothing is reserved for later user/entropy changes.
-    const initialEntropy = 0.5;
+    // Use the most recently supplied field entropy so a newly built graph is
+    // immediately consistent even when the simulation is paused.
     this.dry.gain.value = 1 - this.reverbMix * 0.5;
     this.wet.gain.value = this.reverbMix;
-    this.delay.delayTime.value = 0.09 + initialEntropy * 0.5;
-    this.feedback.gain.value = 0.16 + initialEntropy * 0.43;
+    this.delay.delayTime.value = 0.09 + this.entropy * 0.5;
+    this.feedback.gain.value = 0.16 + this.entropy * 0.43;
     this.master.gain.value = this.volume;
 
     this.analyser.fftSize = 256;
@@ -157,11 +158,11 @@ export class QNTOYAudio {
   }
 
   setEntropy(entropy) {
+    this.entropy = clamp(Number(entropy) || 0, 0, 1);
     if (!this.context) return;
-    const e = clamp(Number(entropy) || 0, 0, 1);
     const now = this.context.currentTime;
-    this.delay.delayTime.setTargetAtTime(0.09 + e * 0.5, now, 0.04);
-    this.feedback.gain.setTargetAtTime(0.16 + e * 0.43, now, 0.04);
+    this.delay.delayTime.setTargetAtTime(0.09 + this.entropy * 0.5, now, 0.04);
+    this.feedback.gain.setTargetAtTime(0.16 + this.entropy * 0.43, now, 0.04);
   }
 
   frequencyForState(state) {
@@ -265,7 +266,13 @@ export class QNTOYAudio {
   }
 
   getSpectrum(target = null) {
-    if (!this.analyser) return target || new Uint8Array(0);
+    if (!this.analyser || !this.enabled) {
+      if (target) {
+        target.fill(0);
+        return target;
+      }
+      return new Uint8Array(0);
+    }
     const destination = target && target.length === this.spectrumData.length ? target : this.spectrumData;
     this.analyser.getByteFrequencyData(destination);
     return destination;

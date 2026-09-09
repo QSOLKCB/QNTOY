@@ -64,6 +64,7 @@ function commitChanges(changes, { sonify = true, forceStats = false } = {}) {
 
 async function toggleAudio() {
   try {
+    audio.setEntropy(field.entropy());
     const enabled = await audio.toggle();
     elements.audioButton.textContent = enabled ? 'STOP AUDIO' : 'START AUDIO';
     elements.audioButton.classList.toggle('is-active', enabled);

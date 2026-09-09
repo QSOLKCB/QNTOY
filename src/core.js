@@ -77,7 +77,7 @@ export class QutritField {
   }
 
   setState(index, nextState, changes = null) {
-    if (index < 0 || index >= this.size) return false;
+    if (!Number.isInteger(index) || index < 0 || index >= this.size) return false;
     const state = Number(nextState);
     if (!Number.isInteger(state) || state < 0 || state >= STATE_COUNT) {
       throw new RangeError(`state must be an integer from 0 to ${STATE_COUNT - 1}`);

@@ -262,7 +262,7 @@ export class QutritVisualizer {
   render(time) {
     const level = this.audio.getLevel();
     this.material.uniforms.uAudio.value = level;
-    this.material.uniforms.uTime.value = time;
+    this.material.uniforms.uTime.value = this.reducedMotion ? 0 : time;
     this.ribbonMaterial.opacity = 0.38 + level * 0.62;
     this.updateSpectrum(level);
 

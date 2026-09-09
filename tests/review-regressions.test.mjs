@@ -54,7 +54,7 @@ class FakeAnalyser extends FakeNode {
   set fftSize(value) { this._fftSize = value; this.frequencyBinCount = value / 2; }
   get fftSize() { return this._fftSize; }
   getByteTimeDomainData(target) { target.fill(128); }
-  getByteFrequencyData(target) { target.fill(0); }
+  getByteFrequencyData(target) { target.fill(192); }
 }
 
 class FakeAudioContext {
@@ -93,6 +93,21 @@ test('audio graph initializes safe direct feedback and wet/dry parameters', asyn
   delete globalThis.window;
 });
 
+test('audio graph initializes from entropy supplied before context creation', async () => {
+  globalThis.window = { AudioContext: FakeAudioContext };
+  const audio = new QNTOYAudio();
+  audio.setEntropy(0);
+
+  await audio.start();
+
+  assert.equal(audio.entropy, 0);
+  assert.ok(Math.abs(audio.delay.delayTime.value - 0.09) < 1e-12);
+  assert.ok(Math.abs(audio.feedback.gain.value - 0.16) < 1e-12);
+
+  await audio.stop();
+  delete globalThis.window;
+});
+
 test('stop hard-mutes, closes, and rebuilds the audio graph on restart', async () => {
   globalThis.window = { AudioContext: FakeAudioContext };
   const audio = new QNTOYAudio();
@@ -112,6 +127,24 @@ test('stop hard-mutes, closes, and rebuilds the audio graph on restart', async (
   assert.equal(audio.enabled, true);
   assert.notEqual(audio.context, firstContext);
   assert.equal(audio.context.state, 'running');
+
+  await audio.stop();
+  delete globalThis.window;
+});
+
+test('getSpectrum clears a caller buffer as soon as audio is disabled', async () => {
+  globalThis.window = { AudioContext: FakeAudioContext };
+  const audio = new QNTOYAudio();
+  await audio.start();
+
+  const target = new Uint8Array(128);
+  audio.getSpectrum(target);
+  assert.ok(target.some((value) => value !== 0));
+
+  audio.enabled = false;
+  const returned = audio.getSpectrum(target);
+  assert.equal(returned, target);
+  assert.ok(target.every((value) => value === 0));
 
   await audio.stop();
   delete globalThis.window;
@@ -157,4 +190,16 @@ test('replaceStates rejects values before Uint8 coercion and preserves the field
     assert.deepEqual(Array.from(field.states), initialStates);
     assert.deepEqual(Array.from(field.counts), initialCounts);
   }
+});
+
+test('setState rejects fractional indexes without corrupting counts', () => {
+  const field = new QutritField({ width: 3, height: 1, randomize: false });
+  const changes = [];
+  const initialCounts = Array.from(field.counts);
+
+  assert.equal(field.setState(1.5, 2, changes), false);
+  assert.deepEqual(Array.from(field.states), [0, 0, 0]);
+  assert.deepEqual(Array.from(field.counts), initialCounts);
+  assert.deepEqual(changes, []);
+  assert.equal(Array.from(field.counts).reduce((sum, value) => sum + value, 0), field.size);
 });
