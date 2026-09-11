@@ -1,13 +1,6 @@
 # QNTOY v3 — Quantum Amiga Audio-Visual Toy
 
 [![CI](https://github.com/QSOLKCB/QNTOY/actions/workflows/ci.yml/badge.svg)](https://github.com/QSOLKCB/QNTOY/actions/workflows/ci.yml)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17540042.svg)](https://doi.org/10.5281/zenodo.17540042)
-
-QNTOY is a browser-native, qutrit-inspired stochastic field instrument. A seeded three-state lattice evolves in real time, state transitions are sonified with the Web Audio API, and the field is rendered as a GPU-accelerated Three.js point surface.
-
-**Author:** Trent Slade / QSOL-IMC  
-**License:** MIT  
-**Original archived DOI:** `10.5281/zenodo.17540042`
 
 > **Scientific boundary:** QNTOY is an educational and creative information-physics toy. It is **not** a quantum computer emulator, does not implement physical qutrit unitary dynamics, and should not be used as evidence of quantum behaviour.
 
@@ -163,14 +156,6 @@ The application respects `prefers-reduced-motion` by disabling automatic camera 
 3. Prefer browser standards over framework abstractions when the platform already provides the capability.
 4. Keep scientific language explicit about what is simulated and what is merely inspired by quantum information concepts.
 5. Keep exports inspectable: CSV for telemetry, JSON for full state snapshots.
-
-## Citation
-
-For the original archived QNTOY work:
-
-> Slade, T. (2025). *Quantum Amiga 1200 — QNTOY v2: A Self-Modulating Audio-Visual Entropy Simulator.* Zenodo. DOI: 10.5281/zenodo.17540042
-
-The v3 rebuild should receive a new release tag / archive record if it is intended to be cited as a distinct software version.
 
 ## License
 
