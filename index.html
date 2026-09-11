@@ -1,15 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#061014" />
+  <meta
+    name="description"
+    content="QNTOY — a seeded qutrit-inspired stochastic field with Web Audio sonification and Three.js visualization."
+  />
+  <title>QNTOY v3 — Quantum Amiga Audio-Visual Toy</title>
+  <link rel="stylesheet" href="/src/styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#controls">Skip to controls</a>
 
-  <!DOCTYPE html>
-  <html lang="en">
-    <head>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>Quantum Software Emulator</title>
-    </head>
+  <div class="app-shell">
+    <header class="masthead">
+      <div>
+        <p class="eyebrow">QSOL-IMC / QNTOY</p>
+        <h1>Quantum Amiga <span>v3</span></h1>
+        <p class="subtitle">Seeded qutrit field · Web Audio instrument · Three.js visualizer</p>
+      </div>
+      <div class="masthead-status" aria-label="Runtime status">
+        <span class="status-dot" id="run-dot"></span>
+        <span id="run-status">RUNNING</span>
+        <span class="divider">/</span>
+        <span id="audio-status">AUDIO OFF</span>
+      </div>
+    </header>
 
-    <body>
-      <div id="root"></div>
-      <script type="module" src="/src/main.tsx"></script>
-    </body>
-  </html>
-  
+    <main class="workspace">
+      <section class="viewport-panel panel" aria-labelledby="field-heading">
+        <div class="panel-heading viewport-heading">
+          <div>
+            <p class="section-kicker">FIELD / 160 × 120</p>
+            <h2 id="field-heading">19,200-qutrit phase surface</h2>
+          </div>
+          <div class="toolbar">
+            <button class="button button-quiet" id="view-button" type="button" title="Cycle camera view (V)">VIEW: ORBIT</button>
+            <button class="button button-quiet" id="snapshot-button" type="button" title="Export deterministic snapshot">EXPORT JSON</button>
+          </div>
+        </div>
+
+        <div class="scene-wrap" id="scene-wrap">
+          <div id="scene" class="scene" role="img" aria-label="Three-dimensional qutrit field"></div>
+          <div class="crt-scanlines" aria-hidden="true"></div>
+          <div class="crt-vignette" aria-hidden="true"></div>
+          <div class="hud" aria-hidden="true">
+            <span>STATE FIELD</span>
+            <span id="hud-seed">SEED QNTOY-v3</span>
+          </div>
+        </div>
+
+        <div class="legend" aria-label="Qutrit state legend">
+          <span><i class="legend-swatch state-zero"></i>|0⟩ crimson</span>
+          <span><i class="legend-swatch state-one"></i>|1⟩ phosphor</span>
+          <span><i class="legend-swatch state-two"></i>|2⟩ cobalt</span>
+          <span class="legend-note">Point height encodes toy state; audio spectrum rides the lower edge.</span>
+        </div>
+      </section>
+
+      <aside class="rack" id="controls" aria-label="QNTOY controls">
+        <section class="panel control-panel" aria-labelledby="transport-heading">
+          <div class="panel-heading">
+            <div>
+              <p class="section-kicker">TRANSPORT</p>
+              <h2 id="transport-heading">Simulation + audio</h2>
+            </div>
+          </div>
+          <div class="button-grid transport-grid">
+            <button class="button button-primary" id="audio-button" type="button" title="Enable or disable audio (A)">START AUDIO</button>
+            <button class="button" id="pause-button" type="button" title="Pause or run simulation (Space)">PAUSE</button>
+            <button class="button button-accent" id="pulse-button" type="button" title="Force a transition burst (P)">PULSE</button>
+          </div>
+        </section>
+
+        <section class="panel control-panel" aria-labelledby="ops-heading">
+          <div class="panel-heading">
+            <div>
+              <p class="section-kicker">FIELD OPS</p>
+              <h2 id="ops-heading">Toy qutrit operations</h2>
+            </div>
+          </div>
+          <div class="button-grid operation-grid">
+            <button class="button" data-operation="reset" type="button">RESET</button>
+            <button class="button" data-operation="randomize" type="button">RANDOM</button>
+            <button class="button" data-operation="hadamard" type="button" title="Qutrit-inspired mixing operation (1)">MIX / H</button>
+            <button class="button" data-operation="phase" type="button" title="Cyclic phase-like rotation (2)">PHASE</button>
+            <button class="button" data-operation="measure" type="button" title="Measurement-like collapse operation (3)">MEASURE</button>
+          </div>
+          <p class="microcopy">These are pedagogical qutrit-inspired transforms, not a physical quantum-gate simulator.</p>
+        </section>
+
+        <section class="panel control-panel" aria-labelledby="synth-heading">
+          <div class="panel-heading">
+            <div>
+              <p class="section-kicker">SYNTH / FIELD</p>
+              <h2 id="synth-heading">Coupling controls</h2>
+            </div>
+          </div>
+
+          <div class="slider-stack">
+            <label class="slider-row" for="rate-control">
+              <span><b>EVOLUTION</b><output id="rate-output">2.0%</output></span>
+              <input id="rate-control" type="range" min="0" max="20" step="0.25" value="2" />
+            </label>
+
+            <label class="slider-row" for="volume-control">
+              <span><b>MASTER</b><output id="volume-output">16%</output></span>
+              <input id="volume-control" type="range" min="0" max="40" step="1" value="16" />
+            </label>
+
+            <label class="slider-row" for="reverb-control">
+              <span><b>REVERB</b><output id="reverb-output">32%</output></span>
+              <input id="reverb-control" type="range" min="0" max="80" step="1" value="32" />
+            </label>
+
+            <label class="slider-row" for="spread-control">
+              <span><b>STEREO FIELD</b><output id="spread-output">90%</output></span>
+              <input id="spread-control" type="range" min="0" max="100" step="1" value="90" />
+            </label>
+
+            <label class="slider-row" for="point-control">
+              <span><b>POINT SIZE</b><output id="point-output">4.2</output></span>
+              <input id="point-control" type="range" min="2" max="8" step="0.1" value="4.2" />
+            </label>
+          </div>
+        </section>
+
+        <section class="panel control-panel" aria-labelledby="seed-heading">
+          <div class="panel-heading">
+            <div>
+              <p class="section-kicker">REPRODUCIBILITY</p>
+              <h2 id="seed-heading">Deterministic seed</h2>
+            </div>
+          </div>
+          <form class="seed-form" id="seed-form">
+            <label for="seed-input">Seed string</label>
+            <div class="seed-row">
+              <input id="seed-input" name="seed" type="text" maxlength="96" value="QNTOY-v3" autocomplete="off" spellcheck="false" />
+              <button class="button" type="submit">APPLY</button>
+            </div>
+          </form>
+          <div class="data-buttons">
+            <button class="button button-quiet" id="log-button" type="button" title="Record a 60-second CSV log (L)">LOG 60 S CSV</button>
+          </div>
+        </section>
+
+        <section class="panel stats-panel" aria-labelledby="stats-heading">
+          <div class="panel-heading">
+            <div>
+              <p class="section-kicker">TELEMETRY</p>
+              <h2 id="stats-heading">Live state</h2>
+            </div>
+          </div>
+
+          <dl class="stats-grid">
+            <div><dt>Cycles</dt><dd id="stat-cycles">0</dd></div>
+            <div><dt>Entropy</dt><dd id="stat-entropy">0.000</dd></div>
+            <div><dt>Audio RMS</dt><dd id="stat-audio">0%</dd></div>
+            <div><dt>Reverb</dt><dd id="stat-reverb">0.00 s</dd></div>
+          </dl>
+
+          <div class="distribution" aria-label="State distribution">
+            <div class="distribution-row">
+              <span id="state-zero-label">|0⟩</span><meter id="meter-zero" aria-labelledby="state-zero-label" min="0" max="1" value="0"></meter><output id="count-zero">0</output>
+            </div>
+            <div class="distribution-row">
+              <span id="state-one-label">|1⟩</span><meter id="meter-one" aria-labelledby="state-one-label" min="0" max="1" value="0"></meter><output id="count-one">0</output>
+            </div>
+            <div class="distribution-row">
+              <span id="state-two-label">|2⟩</span><meter id="meter-two" aria-labelledby="state-two-label" min="0" max="1" value="0"></meter><output id="count-two">0</output>
+            </div>
+          </div>
+        </section>
+      </aside>
+    </main>
+
+    <section class="info-strip" aria-label="About QNTOY">
+      <div>
+        <b>WHAT IT IS</b>
+        <p>A seeded three-state stochastic field whose transitions drive procedural sound and a GPU-rendered point surface.</p>
+      </div>
+      <div>
+        <b>WHAT IT ISN'T</b>
+        <p>It is not a quantum computer emulator and does not claim to model physical qutrit dynamics.</p>
+      </div>
+      <div>
+        <b>KEYS</b>
+        <p><kbd>A</kbd> audio · <kbd>Space</kbd> pause · <kbd>P</kbd> pulse · <kbd>1</kbd>/<kbd>2</kbd>/<kbd>3</kbd> ops · <kbd>V</kbd> view · <kbd>L</kbd> log</p>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <span>QNTOY v3 · Trent Slade / QSOL-IMC</span>
+      <span>MIT · browser-native runtime · Three.js + Web Audio API</span>
+    </footer>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="/src/app.js"></script>
+</body>
+</html>

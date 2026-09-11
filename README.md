@@ -1,200 +1,179 @@
-# 🎛️ Quantum Amiga 1200 — QNTOY v2  
-### *Self-Modulating Audio-Visual Entropy Simulator*  
+# QNTOY v3 — Quantum Amiga Audio-Visual Toy
+
+[![CI](https://github.com/QSOLKCB/QNTOY/actions/workflows/ci.yml/badge.svg)](https://github.com/QSOLKCB/QNTOY/actions/workflows/ci.yml)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17540042.svg)](https://doi.org/10.5281/zenodo.17540042)
 
-**Author:** Trent Slade (0009-0002-4515-9237)  
-**Assistive Tools:** ChatGPT-5 (code generation), Figma Make (interface prototyping)  
-**License:** MIT License  
+QNTOY is a browser-native, qutrit-inspired stochastic field instrument. A seeded three-state lattice evolves in real time, state transitions are sonified with the Web Audio API, and the field is rendered as a GPU-accelerated Three.js point surface.
 
----
+**Author:** Trent Slade / QSOL-IMC  
+**License:** MIT  
+**Original archived DOI:** `10.5281/zenodo.17540042`
 
-## 🧠 Overview
-**QNTOY** is a browser-based simulation where quantum information theory meets vintage Amiga aesthetics.  
-Every pixel represents a **qutrit** (three-state quantum unit).  
-Each update cycle evolves the field, generates corresponding sound via the Web Audio API, and visualizes entropy as color and light.  
-The result is a living feedback organism — a machine that literally *plays its own mathematics*.
+> **Scientific boundary:** QNTOY is an educational and creative information-physics toy. It is **not** a quantum computer emulator, does not implement physical qutrit unitary dynamics, and should not be used as evidence of quantum behaviour.
 
----
+## What changed in v3
 
-## ⚙️ Features
-- **Qutrit Field Engine** – 3-level probabilistic array evolving in real time.  
-- **Quantum SID-Chip** – Procedural audio synthesis driven by qutrit flips.  
-- **Spectral Reverb** – Lightweight feedback network mimicking a plate reverb.  
-- **Entropy Feedback** – Reverb time, pitch modulation, and visual brightness scale with system entropy.  
-- **Low-RAM Mode** – Adjustable resolution and frame rate for older hardware.  
+QNTOY v3 removes the React/Figma-generated application stack and rebuilds the runtime around the browser platform itself.
 
----
+- **No React, JSX, Radix UI, Tailwind utility layer, or component framework.**
+- **Plain semantic HTML + CSS + JavaScript modules.**
+- **Three.js GPU renderer** for the 19,200-point qutrit field.
+- **Web Audio API synth** with state-mapped oscillators, stereo panning, analyser feedback, compression, and entropy-coupled delay/reverb.
+- **Seeded PRNG** so a seed actually reproduces the same field evolution.
+- **Live Three.js spectrum ribbon** driven by the Web Audio analyser.
+- **CSV telemetry logging** with cycles, entropy, state counts, reverb time, audio level, and seed.
+- **JSON field snapshots** for reproducibility and later analysis.
+- **Responsive, keyboard-accessible control rack** with no UI framework dependency.
+- **Node unit tests** for deterministic field behaviour and entropy invariants.
+- **GitHub Actions CI** for syntax checks, tests, and production build verification.
 
-## 🚀 Quick Start
+The dependency surface drops from a large React/Radix ecosystem to just **Three.js** at runtime and **Vite** as the build tool.
 
-### Clone or Download
+## Quick start
+
+### Requirements
+
+- Node.js 20+
+- npm
+- A modern desktop browser with WebGL2/WebGL and Web Audio support
+
+### Run locally
+
 ```bash
 git clone https://github.com/QSOLKCB/QNTOY.git
 cd QNTOY
-Run Locally
-Open index.html in any modern Chromium browser.
+npm install
+npm run dev
+```
 
-Click anywhere to enable audio (Web Audio policy).
+Open the local URL printed by Vite. Audio must be started with the **START AUDIO** button because browsers require a user gesture before Web Audio playback.
 
-Online Demo: https://qntoyv2.figma.site
+### Production build
 
-🎮 Controls
-Action	Effect
-Pulse	Forces an entropy spike (visual + auditory).
-Reset	Collapses all qutrits to |0⟩ state.
-🔊 Enable Audio	Required user gesture to start Web Audio.
-Reverb Mix Slider	Adjusts wet/dry signal ratio.
+```bash
+npm run build
+npm run preview
+```
 
-🧩 Architecture
-bash
-Copy code
-/src
- ├── QAmigaCore.ts      # qutrit logic + entropy estimator
- ├── QAmigaAudio.ts     # SID-chip oscillator + LFO engine
- ├── QAmigaReverb.ts    # dual feedback delay network
- ├── QAmigaDisplay.tsx  # canvas renderer + audio-visual coupling
- ├── QAmigaControls.tsx # UI buttons + sliders
- ├── QAmigaStats.tsx    # live metrics (cycles, entropy, qutrit count)
- └── logger.js          # CSV data-logger
-📚 Citation
-Slade, T. (2025). Quantum Amiga 1200 — QNTOY v2: A Self-Modulating Audio-Visual Entropy Simulator.
-Zenodo. https://doi.org/10.5281/zenodo.17540042
+The generated `dist/` directory is static and can be deployed to GitHub Pages or any ordinary static host. Three.js is bundled into the build, so the deployed app does not depend on a runtime CDN.
 
-🙌 Acknowledgements
-Built with code-generation assistance from ChatGPT-5 and interface synthesis via Figma Make.
-Dedicated to the experimental lineage of the Commodore Amiga and every scientist who ever thought sound could be data.
+### Verify
 
-🧪 Usage for Zenodo Reviewers
-The simulation demonstrates entropy-driven feedback between information, sound, and light using entirely client-side computation.
-It visualizes how probabilistic state evolution can be sonified and measured in real time.
+```bash
+npm run check
+npm test
+npm run build
+```
 
-Scientific / Educational Applications
-Illustrates superposition, entropy, and decoherence through interactive media.
+## Controls
 
-Enables measurement of emergent order from stochastic dynamics via on-screen entropy and optional CSV logging.
+| Control | Action |
+|---|---|
+| Start Audio | Lazily creates/resumes the Web Audio graph |
+| Pause / Run | Stops or resumes automatic field evolution |
+| Pulse | Forces a high-probability transition burst and three-state audio sweep |
+| Reset | Sets every cell to `|0⟩` and resets cycle count |
+| Random | Re-randomizes the field using the current seeded PRNG stream |
+| Mix / H | Qutrit-inspired mixing transform; **not** a physical Hadamard gate |
+| Phase | Cyclic state rotation on a seeded subset of cells |
+| Measure | Measurement-like collapse transform used for the toy interaction model |
+| Evolution | Per-cycle cell transition probability |
+| Master | Web Audio master gain |
+| Reverb | Wet/dry delay-network mix |
+| Stereo Field | Horizontal state-transition panning width |
+| Point Size | Three.js qutrit point size |
+| Seed | Reinitializes the PRNG and field deterministically |
+| Log 60 s CSV | Records telemetry once per second and downloads CSV |
+| Export JSON | Downloads a full deterministic field snapshot |
+| View | Cycles orbit, top, and side cameras |
 
-Serves as a teaching platform for information physics and feedback loops using only JavaScript + Web Audio.
+Keyboard shortcuts: `A` audio, `Space` pause/run, `P` pulse, `R` reset, `1` mix, `2` phase, `3` measure, `V` view, `L` telemetry log.
 
-Verification & Reproducibility
-Deterministic given the same random seed.
+## Architecture
 
-Entropy, audio level, and reverb logged via logger.js.
+```text
+QNTOY/
+├── index.html                  # semantic application shell
+├── src/
+│   ├── app.js                  # DOM events + simulation scheduler
+│   ├── core.js                 # deterministic three-state field
+│   ├── audio.js                # Web Audio synth / reverb / analyser
+│   ├── visualizer.js           # Three.js point field + spectrum ribbon
+│   ├── logger.js               # CSV + JSON export utilities
+│   └── styles.css              # responsive Amiga/oscilloscope visual system
+├── tests/
+│   └── core.test.mjs           # deterministic core tests
+├── .github/workflows/
+│   └── ci.yml                  # check + test + build
+├── ARCHITECTURE.md
+├── ROADMAP.md
+├── THIRD_PARTY_NOTICES.md
+└── vite.config.js
+```
 
-Fully offline; no external libraries or data calls.
+See [ARCHITECTURE.md](ARCHITECTURE.md) for data flow and subsystem boundaries.
 
-System Requirements
-Chromium browser (Chrome, Edge, Brave, Arc).
+## Reproducibility
 
-Modern CPU with SIMD; 8 GB RAM recommended (≤ 2 GB with Low-RAM mode).
+The v3 core uses an explicit seeded PRNG rather than `Math.random()`. Two fresh fields using the same dimensions, seed, operation order, and control values will produce the same state sequence.
 
-Manual click required to enable audio (per Web Audio policy).
+Reproducibility applies to the **field state evolution**. Audio timing and rendered frame timing are browser/runtime outputs and are not guaranteed to be sample-identical across machines.
 
-Expected Output
-Visual: 2D qutrit field pulsing with entropy.
+A snapshot export contains:
 
-Audio: Evolving tonal field whose timbre and reverb reflect entropy dynamics.
+- seed
+- field dimensions
+- cycle count
+- normalized Shannon entropy
+- state counts
+- all qutrit state values
 
-CSV: timestamp, entropy, reverb_time, audio_level.
+## Entropy model
 
-🧭 Notes for Reviewers
-The following code block shows the main entry point (Main.tsx).
-It initializes the simulation (160×120 Low-RAM mode) and provides a 60-second CSV logger.
+QNTOY measures normalized Shannon entropy over the three state populations:
 
-tsx
-Copy code
-// Quantum Amiga 1200 — QNTOY v2 Main Entry
-// Trent Slade 2025
+```text
+H = -Σ pᵢ log₂(pᵢ) / log₂(3)
+```
 
-import { useEffect, useRef } from "react";
-import { QAmigaCore } from "./QAmigaCore";
-import QAmigaDisplay from "./QAmigaDisplay";
-import QAmigaControls from "./QAmigaControls";
-import QAmigaStats from "./QAmigaStats";
-import { QNLogger } from "./logger";
+This yields `0` when the field occupies one state and approaches `1` when all three states are evenly populated.
 
-export default function App() {
-  const coreRef = useRef<QAmigaCore | null>(null);
-  const loggerRef = useRef<QNLogger | null>(null);
+Entropy is used as a control signal for the audio engine. Higher entropy increases delay time, feedback, spectral brightness, and event duration. This is an intentionally designed sonification mapping, not a claim that physical quantum entropy produces those acoustic effects.
 
-  useEffect(() => {
-    const core = new QAmigaCore(160, 120); // Low-RAM mode
-    const logger = new QNLogger(core);
-    coreRef.current = core;
-    loggerRef.current = logger;
-  }, []);
+## Audio mapping
 
-  const startLogging = () => loggerRef.current?.start();
+The three states retain the original QNTOY octave mapping:
 
-  return (
-    <div className="flex flex-col items-center justify-center bg-slate-900 text-white p-4 min-h-screen font-mono">
-      <h1 className="text-xl text-cyan-400 mb-1 text-center">
-        Quantum Amiga 1200 — QNTOY v2
-      </h1>
-      <p className="text-sm text-gray-400 mb-3">
-        Self-Modulating Audio-Visual Entropy Simulator
-      </p>
-      {coreRef.current && <QAmigaDisplay core={coreRef.current} />}
-      {coreRef.current && <QAmigaControls core={coreRef.current} />}
-      {coreRef.current && <QAmigaStats core={coreRef.current} />}
-      <button
-        onClick={startLogging}
-        className="mt-3 bg-cyan-700 hover:bg-cyan-600 text-white py-1 px-3 rounded-lg"
-      >
-        Start 60 s Log
-      </button>
-      <div className="text-xs text-gray-500 mt-4 text-center">
-        © 2025 Trent Slade • Built with ChatGPT-5 + Figma Make
-      </div>
-    </div>
-  );
-}
-Reviewer Instructions
-Run in any Chromium browser.
+- `|0⟩` → 110 Hz
+- `|1⟩` → 220 Hz
+- `|2⟩` → 440 Hz
 
-Click window to enable audio.
+Transition position controls stereo pan. Entropy controls filter brightness and feedback-delay behaviour. Voice count is deliberately capped per field update to prevent large transition bursts from spawning thousands of oscillators.
 
-Observe brightness ↔ entropy and tone ↔ state transitions.
+## Performance
 
-Press Start 60 s Log → downloads qntoy_log.csv.
+The default field remains `160 × 120 = 19,200` qutrits. The Three.js renderer stores them in one `BufferGeometry` and updates only changed state attributes after each simulation step. Rendering and simulation scheduling are decoupled: Three.js renders smoothly while the stochastic field advances at a roughly 30 Hz cadence.
 
-Compare entropy vs. sound complexity in the CSV.
+The application respects `prefers-reduced-motion` by disabling automatic camera rotation.
 
-For longer runs or higher res:
+## Development principles
 
-ts
-Copy code
-const core = new QAmigaCore(320, 256); // full-res
-const logger = new QNLogger(core, 120); // 2-minute log
-Test across browsers and frame rates for consistency.
+1. Keep the **field model deterministic and browser-independent**.
+2. Treat audio and rendering as views of the field, not as hidden state owners.
+3. Prefer browser standards over framework abstractions when the platform already provides the capability.
+4. Keep scientific language explicit about what is simulated and what is merely inspired by quantum information concepts.
+5. Keep exports inspectable: CSV for telemetry, JSON for full state snapshots.
 
-🎧 Expected Observations
-Low entropy: dim image + steady tone.
+## Citation
 
-High entropy: bright CRT flare, chaotic panning, long reverb.
+For the original archived QNTOY work:
 
-CSV data: entropy and reverb rise together → confirms feedback loop.
+> Slade, T. (2025). *Quantum Amiga 1200 — QNTOY v2: A Self-Modulating Audio-Visual Entropy Simulator.* Zenodo. DOI: 10.5281/zenodo.17540042
 
-🪪 License
-text
-Copy code
-MIT License
+The v3 rebuild should receive a new release tag / archive record if it is intended to be cited as a distinct software version.
 
-Copyright (c) 2025 Trent Slade
+## License
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+MIT. See [LICENSE](LICENSE).
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+Three.js is distributed under the MIT License. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
